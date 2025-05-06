@@ -4,9 +4,27 @@ from pydantic import BaseModel
 # this is the used for validation the req and res that we send and recieve the structure of it can be 
 # modified using pydantic
 from typing import List
-# 
+
+from pymongo.mongo_client import MongoClient
+#this is a client which helps us to interact with mongodb
+from pymongo.server_api import ServerApi
+# this helps us to decide the type of server to use to connect to mongo db
+#without this it will take a default latest server
 
 app = FastAPI()
+
+uri = "mongodb+srv://purplescissorsorg:7B6IgeNZKd3hrewl@cluster0.uvaagdj.mongodb.net/?retryWrites=true&w=majority"
+
+client = MongoClient(uri, server_api=ServerApi('1'))
+
+
+# here client is instance object made to interact with mongo db and admin is main database which handle commands and command is 
+# req send to db and ping checks for connection has been done or not
+try: 
+    client.admin.command('ping')
+    print("✅ Successfully connected to MongoDB")
+except Exception as e:
+    print("❌ Failed to connect to MongoDB:", e)
 
 class Tea(BaseModel):
     id: int
@@ -21,8 +39,8 @@ teas: List[Tea] = []
 # (endpoints) and associate them with specific HTTP methods like GET, POST, etc.
 
 @app.get("/")
-def read_root():
-    return {"message": "Welcome to Hardik Site"}
+def root():
+    return {"message": "MongoDB connection established!"}
 
 @app.get("/teas")
 def get_teas():
@@ -48,6 +66,7 @@ def delete_tea(tea_id: int):
         if tea.id == tea_id:
             deleted = teas.pop(index) # here pop returns the value deleted which can be stored in a variable
             return deleted
-        
+
+
 
 
